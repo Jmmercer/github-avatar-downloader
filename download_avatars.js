@@ -3,7 +3,12 @@ var fs = require('fs');
 var GITHUB_USER = 'Jmmercer';
 var UA = 'Jmmercer'
 var GITHUB_TOKEN = '14eabf81f8ba895f6abf4d7ab0120553c442811f';
+var repoOwner = process.argv[2];
+var repoName = process.argv[3];
 
+if (!repoOwner || !repoName){
+  throw err;
+}
 
 console.log('Welcome to the GitHub Avatar Downloader');
 
