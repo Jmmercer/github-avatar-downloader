@@ -1,15 +1,24 @@
 var request = require('request');
-require('dotenv').config()
+var dotenvResult = require('dotenv').config();
 var fs = require('fs');
 var GITHUB_USER = process.env.GITHUB_USER;
 var UA = 'Jmmercer';
 var GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 var repoOwner = process.argv[2];
 var repoName = process.argv[3];
-//console.log(process.cwd());
 
+
+if (dotenvResult.error){
+  throw '.env missing'
+}
+if (!GITHUB_USER || !GITHUB_TOKEN) {
+  throw 'Missing Token, or User from .env';
+}
 if (!repoOwner || !repoName){
   throw 'Either Repo owner, or repo name not given';
+}
+if (process.argv.length !== 4) {
+  throw 'Incorrect number of arguments';
 }
 
 console.log('Welcome to the GitHub Avatar Downloader');
@@ -26,7 +35,12 @@ function getRepoContributors(repoOwner, repoName, cb) {
     }
   };
   request(options, GITHUB_USER, function(err, response, body){
-    if (err) throw err;
+    if (response.statusCode === 404) {
+      throw '404, Owner/Repo not found.';
+    }
+    if (response.statusCode === 401) {
+      throw '401, Bad credentials'
+    }
 
     console.log('Response Status Code: ', response.statusCode);
     console.log(JSON.parse(body, {}))
