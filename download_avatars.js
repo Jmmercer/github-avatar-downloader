@@ -1,12 +1,12 @@
 var request = require('request');
+require('dotenv').config()
 var fs = require('fs');
-var GITHUB_USER = 'Jmmercer';
-var UA = 'Jmmercer'
-var GITHUB_TOKEN = '14eabf81f8ba895f6abf4d7ab0120553c442811f';
+var GITHUB_USER = process.env.GITHUB_USER;
+var UA = 'Jmmercer';
+var GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 var repoOwner = process.argv[2];
 var repoName = process.argv[3];
-
-console.log(process.cwd());
+//console.log(process.cwd());
 
 if (!repoOwner || !repoName){
   throw 'Either Repo owner, or repo name not given';
@@ -25,25 +25,21 @@ function getRepoContributors(repoOwner, repoName, cb) {
       'User-Agent': 'request'
     }
   };
-
   request(options, GITHUB_USER, function(err, response, body){
     if (err) throw err;
 
     console.log('Response Status Code: ', response.statusCode);
-    //console.log(body);
+    console.log(JSON.parse(body, {}))
     JSON.parse(body, {}).forEach(function(contributor){
       console.log(contributor.avatar_url)
-      fs.mkdirSync('/home/vagrant/avatars/');
-      var filePath = '/home/vagrant/avatars/' + contributor + '.jpg';
+      if (!fs.statSync('./avatars'))
+        fs.mkdirSync('./avatars');
+      var filePath = './avatars/' + contributor.login + '.png';
       console.log(contributor.avatar_url)
       downloadImageByURL(contributor.avatar_url, filePath);
     });
-    //console.log(JSON.parse(body, {}))
   });
-
 }
-
-
 function downloadImageByURL(url, filePath) {
   request.get(url)
     .on('error', function (err){
